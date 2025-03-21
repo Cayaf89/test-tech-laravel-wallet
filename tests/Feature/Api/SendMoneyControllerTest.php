@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\V1\SendMoneyController;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Notifications\UserWalletBalanceLow;
+use Illuminate\Support\Facades\Notification;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseCount;
@@ -63,4 +65,24 @@ test('cannot send money to a friend with insufficient balance', function () {
         ]);
 
     expect($recipient->refresh()->wallet->balance)->toBe(0);
+});
+
+test('send notification when wallet balance is low', function () {
+    $user = User::factory()
+        ->has(Wallet::factory()->richChillGuy())
+        ->create();
+
+    $recipient = User::factory()
+        ->has(Wallet::factory())
+        ->create();
+
+    actingAs($user);
+
+    postJson(action(SendMoneyController::class), [
+        'recipient_email' => $recipient->email,
+        'amount' => 999900,
+        'reason' => 'Just a chill guy gift',
+    ]);
+
+    Notification::fake()->assertSentTo($user, UserWalletBalanceLow::class);
 });
