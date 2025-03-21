@@ -16,10 +16,18 @@ class WalletTransaction extends Model
 
     protected $guarded = ['id'];
 
+    protected $fillable = [
+        'start_date',
+        'end_date',
+        'frequency',
+    ];
+
     protected function casts(): array
     {
         return [
             'type' => WalletTransactionType::class,
+            'start_date' => 'date',
+            'end_date' => 'date',
         ];
     }
 

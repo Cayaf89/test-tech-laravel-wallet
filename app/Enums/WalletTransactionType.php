@@ -8,6 +8,7 @@ enum WalletTransactionType: string
 {
     case CREDIT = 'credit';
     case DEBIT = 'debit';
+    case RECURRING = 'recurring';
 
     public function isDebit(): bool
     {
@@ -17,5 +18,10 @@ enum WalletTransactionType: string
     public function isCredit(): bool
     {
         return $this === self::CREDIT;
+    }
+
+    public function isRecurring(): bool
+    {
+        return $this === self::RECURRING;
     }
 }

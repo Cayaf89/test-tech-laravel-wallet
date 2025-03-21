@@ -33,6 +33,23 @@ class SendMoneyRequest extends FormRequest
                 'string',
                 'max:255',
             ],
+            'is_recurring' => [
+                'required',
+                'boolean',
+            ],
+            'start_date' => [
+                Rule::requiredIf(fn() => $this->input('is_recurring')),
+                Rule::date()->afterOrEqual(today()),
+            ],
+            'end_date' => [
+                Rule::requiredIf(fn() => $this->input('is_recurring')),
+                'after:start_date',
+            ],
+            'frequency' => [
+                Rule::requiredIf(fn() => $this->input('is_recurring')),
+                'integer',
+                'min:1'
+            ],
         ];
     }
 

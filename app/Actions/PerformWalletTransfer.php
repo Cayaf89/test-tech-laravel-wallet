@@ -8,6 +8,7 @@ use App\Enums\WalletTransactionType;
 use App\Exceptions\InsufficientBalance;
 use App\Models\User;
 use App\Models\WalletTransfer;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 readonly class PerformWalletTransfer
@@ -17,13 +18,17 @@ readonly class PerformWalletTransfer
     /**
      * @throws InsufficientBalance
      */
-    public function execute(User $sender, User $recipient, int $amount, string $reason): WalletTransfer
+    public function execute(User $sender, User $recipient, int $amount, string $reason, WalletTransactionType $sendType, ?Carbon $startDate, ?Carbon $endDate, ?int $frequency): WalletTransfer
     {
-        return DB::transaction(function () use ($sender, $recipient, $amount, $reason) {
+        return DB::transaction(function () use ($sendType, $sender, $recipient, $amount, $reason, $frequency, $startDate, $endDate) {
             $transfer = WalletTransfer::create([
                 'amount' => $amount,
                 'source_id' => $sender->wallet->id,
                 'target_id' => $recipient->wallet->id,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'frequency' => $frequency,
+                'type' => $sendType,
             ]);
 
             $this->performWalletTransaction->execute(
