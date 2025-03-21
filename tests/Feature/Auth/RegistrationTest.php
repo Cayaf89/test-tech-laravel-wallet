@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Models\User;
+
 use function Pest\Laravel\assertAuthenticated;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\get;
 use function Pest\Laravel\post;
 
@@ -21,5 +24,12 @@ test('new users can register', function () {
     ]);
 
     assertAuthenticated();
+
+    $user = User::whereEmail('test@example.com')->first();
+    assertDatabaseHas('wallets', [
+        'user_id' => $user->id,
+        'balance' => 0,
+    ]);
+
     $response->assertRedirect(route('dashboard', absolute: false));
 });

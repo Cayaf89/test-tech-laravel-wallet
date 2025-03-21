@@ -28,10 +28,15 @@ class RegisteredUserController
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        /** @var User $user */
         $user = User::create([
             'name' => $request->name,
             'email' => strtolower($request->email),
             'password' => Hash::make($request->password),
+        ]);
+
+        $user->wallet()->create([
+            'balance' => 0,
         ]);
 
         event(new Registered($user));
